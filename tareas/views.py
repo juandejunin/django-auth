@@ -9,6 +9,8 @@ from django.contrib.auth import login, logout, authenticate
 from django.db import IntegrityError
 
 from .form import TaskCreate
+#importar el modelo de las tareas
+from .models import Task
 
 
 # Create your views here.
@@ -51,7 +53,9 @@ def signup(request):
 
 
 def tasks(request):
-    return render(request, 'tasks.html')
+    #obteniendo todas las tareas que estan en la base de datos
+    tasks =  Task.objects.filter(user=request.user, dateCompleted__isnull=True)
+    return render(request, 'tasks.html', {'tasks':tasks})
 
 
 def create_task(request):
@@ -61,10 +65,25 @@ def create_task(request):
             'form': TaskCreate
         })
     else:
-        print(request.POST)
-        return render(request, 'create_task.html', {
-            'form': TaskCreate
-        })
+        try:
+            # print(request.POST)
+            # cuando el metodo sea post yo voy  a llamar a TaskCreate y le paso el request.POST
+            form = TaskCreate(request.POST)
+        # esto genera un formulario
+        # print(form)
+            nueva_tarea = form.save(commit=False)
+            nueva_tarea.user = request.user
+        # print(nueva_tarea)
+            nueva_tarea.save()
+
+            return redirect('tasks')
+
+        except ValueError:
+            return render (request,'create_task.html',{
+                'form': TaskCreate,
+                'error': 'Por favor ingresa datos validos'
+            })
+
 
 def signout(request):
     logout(request)
