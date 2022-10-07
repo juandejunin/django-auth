@@ -4,4 +4,12 @@
 
 <h1>Crar Tareas</h1>
 
+<form action="/tasks/create/" method="POST">
+    {% csrf_token %}
+    {{form}}
+    <button>
+        save
+    </button>
+</form>
+
 {% endblock %}

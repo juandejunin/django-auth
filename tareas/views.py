@@ -8,6 +8,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login, logout, authenticate
 from django.db import IntegrityError
 
+from .form import TaskCreate
+
 
 # Create your views here.
 def home(request):
@@ -51,9 +53,18 @@ def signup(request):
 def tasks(request):
     return render(request, 'tasks.html')
 
-def create_task(request):
-    return render(request, 'create_task.html')
 
+def create_task(request):
+
+    if request.method == 'GET':
+        return render(request, 'create_task.html', {
+            'form': TaskCreate
+        })
+    else:
+        print(request.POST)
+        return render(request, 'create_task.html', {
+            'form': TaskCreate
+        })
 
 def signout(request):
     logout(request)
@@ -72,9 +83,8 @@ def signin(request):
         if user is None:
             return render(request, 'signin.html', {
                 'form': AuthenticationForm,
-                'error':'El usuario o la contraseña son incorrectos'
+                'error': 'El usuario o la contraseña son incorrectos'
             })
         else:
-            login(request,user)
+            login(request, user)
             return redirect('tasks')
-
